@@ -1,0 +1,34 @@
+2017-12-26 22:01:14 [scrapy.utils.log] INFO: Scrapy 1.4.0 started (bot: JDSpider_scrapy)
+2017-12-26 22:01:14 [scrapy.utils.log] INFO: Overridden settings: {'LOG_STDOUT': True, 'BOT_NAME': 'JDSpider_scrapy', 'LOG_FILE': 'fail.log', 'SPIDER_MODULES': ['JDSpider_scrapy.spiders'], 'NEWSPIDER_MODULE': 'JDSpider_scrapy.spiders', 'USER_AGENT': ['Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', 'Mozilla/5.0 (compatible; Bingbot/2.0; +http://www.bing.com/bingbot.htm)', 'Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)', 'DuckDuckBot/1.0; (+http://duckduckgo.com/duckduckbot.html)', 'Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search/spider.html)', 'Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)', 'ia_archiver (+http://www.alexa.com/site/help/webmasters; crawler@alexa.com)'], 'LOG_ENABLED': False}
+2017-12-26 22:01:14 [scrapy.middleware] INFO: Enabled extensions:
+['scrapy.extensions.corestats.CoreStats',
+ 'scrapy.extensions.logstats.LogStats',
+ 'scrapy.extensions.telnet.TelnetConsole',
+ 'scrapy.extensions.memusage.MemoryUsage']
+2017-12-26 22:01:14 [scrapy.middleware] INFO: Enabled downloader middlewares:
+['scrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware',
+ 'scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware',
+ 'scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware',
+ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware',
+ 'scrapy.downloadermiddlewares.retry.RetryMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware',
+ 'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.RedirectMiddleware',
+ 'scrapy.downloadermiddlewares.cookies.CookiesMiddleware',
+ 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware',
+ 'scrapy.downloadermiddlewares.stats.DownloaderStats']
+2017-12-26 22:01:14 [scrapy.middleware] INFO: Enabled spider middlewares:
+['scrapy.spidermiddlewares.httperror.HttpErrorMiddleware',
+ 'scrapy.spidermiddlewares.offsite.OffsiteMiddleware',
+ 'scrapy.spidermiddlewares.referer.RefererMiddleware',
+ 'scrapy.spidermiddlewares.urllength.UrlLengthMiddleware',
+ 'scrapy.spidermiddlewares.depth.DepthMiddleware']
+2017-12-26 22:01:14 [scrapy.middleware] INFO: Enabled item pipelines:
+['JDSpider_scrapy.pipelines.JdspiderScrapyPipeline']
+2017-12-26 22:01:14 [scrapy.core.engine] INFO: Spider opened
+2017-12-26 22:01:14 [scrapy.extensions.logstats] INFO: Crawled 0 pages (at 0 pages/min), scraped 0 items (at 0 items/min)
+2017-12-26 22:01:14 [scrapy.extensions.telnet] DEBUG: Telnet console listening on 127.0.0.1:6030
+2017-12-26 22:01:14 [scrapy.downloadermiddlewares.redirect] DEBUG: Redirecting (302) to <GET https://www.jd.com/allSort.aspx> from <GET http://www.jd.com/allSort.aspx>
+2017-12-26 22:01:14 [scrapy.core.downloader.tls] WARNING: Remote certificate is not valid for hostname "www.jd.com"; '*.jd.com'!='www.jd.com'
+2017-12-26 22:01:14 [scrapy.core.engine] DEBUG: Crawled (200) <GET https://www.jd.com/allSort.aspx> (referer: None)
+2017-12-26 22:01:14 [scrapy.downloadermiddlewares.retry] DEBUG: Retrying <GET http://list.jd.com/list.html?cat=1320,1585,3986> (failed 1 times): 503 Service Unavailable
