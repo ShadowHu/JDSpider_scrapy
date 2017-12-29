@@ -25,7 +25,7 @@ class JDSpider(scrapy.Spider):
     start_urls = ["http://www.jd.com/allSort.aspx"]
 
 
-    def parse(self, response):
+    def parse(self, response): # process start_url and callback to parse all cate pages
         if not FOOD_TAG:
             nodes = response.xpath('//div[@class="items"]/dl/dd/a/@href')
             for node in nodes:
@@ -37,20 +37,21 @@ class JDSpider(scrapy.Spider):
                 url = 'http:' + node.extract() if node.extract()[:4] != 'http' else node.extract()
                 yield Request(url, callback=self.parse_allcate)
 
-    def parse_allcate(self, response): # return all cate page
+    def parse_allcate(self, response): # process all cates pages and callback to parse every cate page
         maxpage = int(response.xpath('//span[@class="fp-text"]/i/text()')[0].extract())
         for p in range(1, maxpage+1):
             cateurl = response.url + '&page=' + str(p)
             yield Request(cateurl, callback=self.parse_cate)
 
-    def parse_cate(self, response):
+    def parse_cate(self, response): # process every cate page and callback to parse item
         nodes = response.xpath('//div[@id="plist"]//div[@class="p-img"]/a/@href')
         for node in nodes:
             itemurl = 'http:' + node.extract() if node.extract()[:4] != 'http' else node.extract()
             yield Request(itemurl, callback=self.parse_item)
 
     def parse_item(self, response):
-        itemObj = ItemLoader(item=JDItem(), response=response)
+        item=JDItem()
+        itemObj = ItemLoader(item=item, response=response)
         cate = re.search(r'cat: \[(\d{2,5}),(\d{2,5}),(\d{2,5})\]', response.body_as_unicode())
         cateid = 'cat=' + str(cate.group(1)) + ',' + str(cate.group(2)) + ',' + str(cate.group(3))
         # print(cateid)
@@ -72,6 +73,12 @@ class JDSpider(scrapy.Spider):
         yield Request(PRICE_URL+pid, callback=self.parse_price, meta={'item': itemObj})
         yield Request(STOCK_URL + pid + '&' + cateid, callback=self.parse_stock, meta={'item': itemObj})
         yield Request(DESC_URL + pid + '&' + cateid + '&_=' + str(time.time()*1000), callback=self.parse_desc, meta={'item': itemObj})
+        # print("print pid",item.get('pid'))
+
+        # !!!!!Problem here!!!!!
+        # while yield request above, maybe parse function can't get value 
+        # immediately, in this way, return itemObj can't be a full object,
+        # it'll miss some value like price, stock and description.
         return itemObj.load_item()
 
     def parse_price(self, response):
