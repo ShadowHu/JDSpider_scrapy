@@ -72,7 +72,7 @@ DEFAULT_REQUEST_HEADERS = {
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
    # 'JDSpider_scrapy.middlewares.ProxyMiddleware': 90,
-   'JDSpider_scrapy.middlewares.RandomUserAgent':100
+   'JDSpider_scrapy.middlewares.RandomUserAgent': 80
 }
 
 # Enable or disable extensions
@@ -84,7 +84,7 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'JDSpider_scrapy.pipelines.JdspiderScrapyPipeline': 300,
+   'JDSpider_scrapy.pipelines.JdspiderScrapyPipeline': 500,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -119,3 +119,4 @@ MYSQL_PASSWD = '144114'
 # LOG_STDOUT = True
 
 PROXY_LIST = 'AvailIP.txt'
+RETRY_HTTP_CODES = [500, 502, 503, 504, 400, 405, 408]

@@ -28,18 +28,18 @@ class JdspiderScrapyPipeline(object):
 
     def process_item(self, item, spider):
         sql = '''INSERT INTO JDTest (itemUrl, pid, insertTime, title, cateid, brand, shop, categories, images, ptable, params, price, priceInfo, description, stock) VALUES ("%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s");''' % \
-        (item['itemUrl'][0], 
-        item['pid'][0], 
+        (item['itemUrl'], 
+        item['pid'], 
         int(time.time()), 
         self.connect.escape(str(item['title'][0].lstrip().rstrip())), 
-        item['cateid'][0], 
+        item['cateid'], 
         self.connect.escape(str(item['brand'][0])), 
         self.connect.escape(str(item['brand'][2])), 
         self.connect.escape(str(item['categories'])), 
         self.connect.escape(str(item['images'])), 
         self.connect.escape(str(item['ptable'][0])), 
         self.connect.escape(str(item['params'])), 
-        item['price'][0], 
+        item['price'], 
         self.connect.escape(str(item['priceInfo'])), 
         self.connect.escape(str(item['description'])), 
         self.connect.escape(str(item['stock']))

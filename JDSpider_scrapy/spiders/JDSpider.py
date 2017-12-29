@@ -25,7 +25,7 @@ class JDSpider(scrapy.Spider):
     start_urls = ["http://www.jd.com/allSort.aspx"]
 
 
-    def parse(self, response): # process start_url and callback to parse all cate pages
+    def parse(self, response): # process start_url and callback to parse all cate
         if not FOOD_TAG:
             nodes = response.xpath('//div[@class="items"]/dl/dd/a/@href')
             for node in nodes:
@@ -51,50 +51,68 @@ class JDSpider(scrapy.Spider):
 
     def parse_item(self, response):
         item=JDItem()
-        itemObj = ItemLoader(item=item, response=response)
+        itemld = ItemLoader(item=item, response=response)
         cate = re.search(r'cat: \[(\d{2,5}),(\d{2,5}),(\d{2,5})\]', response.body_as_unicode())
         cateid = 'cat=' + str(cate.group(1)) + ',' + str(cate.group(2)) + ',' + str(cate.group(3))
         # print(cateid)
-        itemObj.add_value('cateid', cateid)
+        item['cateid'] = cateid
 
-        itemObj.add_value('itemUrl', response.url)
+        item['itemUrl'] =  response.url
         try:
             pid = re.search('com/\d+', response.url).group(0)[4:]
         except AttributeError:
             pid = re.search('hk/\d+', response.url).group(0)[3:]
-        itemObj.add_value('pid', pid)
-        itemObj.add_xpath('title', '//div[@class="sku-name"]//text()')
-        itemObj.add_xpath('brand', '//ul[@id="parameter-brand"]/li/@title')
-        itemObj.add_xpath('brand', '//div[@class="p-parameter"]/ul/li/a/text()')
-        itemObj.add_xpath('categories', '//div[@id="crumb-wrap"]/div/div/div/a/text()')
-        itemObj.add_xpath('images', '//div[@id="spec-list"]/ul/li/img/@src')
-        itemObj.add_xpath('ptable', '//div[@class="p-parameter"]/ul/li')
-        itemObj.add_xpath('params', '//ul[@class="parameter2 p-parameter-list"]/li/text()')
-        yield Request(PRICE_URL+pid, callback=self.parse_price, meta={'item': itemObj})
-        yield Request(STOCK_URL + pid + '&' + cateid, callback=self.parse_stock, meta={'item': itemObj})
-        yield Request(DESC_URL + pid + '&' + cateid + '&_=' + str(time.time()*1000), callback=self.parse_desc, meta={'item': itemObj})
+        item['pid'] = pid
+        itemld.add_xpath('title', '//div[@class="sku-name"]//text()')
+        itemld.add_xpath('brand', '//ul[@id="parameter-brand"]/li/@title')
+        itemld.add_xpath('brand', '//div[@class="p-parameter"]/ul/li/a/text()')
+        itemld.add_xpath('categories', '//div[@id="crumb-wrap"]/div/div/div/a/text()')
+        itemld.add_xpath('images', '//div[@id="spec-list"]/ul/li/img/@src')
+        itemld.add_xpath('ptable', '//div[@class="p-parameter"]/ul/li')
+        itemld.add_xpath('params', '//ul[@class="parameter2 p-parameter-list"]/li/text()')
+        itemld.load_item()
+        yield Request(PRICE_URL+pid, callback=self.parse_price, meta={'item': item})
+        
+        
+        # while True:
+        #     if item.get('price') and item.get('stock') and item.get('description'):
+        #         yield item
+        #     else:
+        #         time.sleep(3)
+        #         print("sleep to wait")
+        #         continue
+        # 
         # print("print pid",item.get('pid'))
+        # return item
 
-        # !!!!!Problem here!!!!!
-        # while yield request above, maybe parse function can't get value 
-        # immediately, in this way, return itemObj can't be a full object,
-        # it'll miss some value like price, stock and description.
-        return itemObj.load_item()
+            # !!!!!Problem here!!!!!
+            # while yield request above, maybe parse function can't get value 
+            # immediately, in this way, return item can't be a full object,
+            # it'll miss some value like price, stock and description.
 
     def parse_price(self, response):
-        itemObj = response.meta['item']
+        item = response.meta['item']
         js = json.loads(response.body_as_unicode())
-        itemObj.add_value('price', js[0]['p'])
-        itemObj.add_value('priceInfo', response.body_as_unicode())
-        return itemObj.load_item()
+        while True:
+            try:
+                item['price'] = js[0]['p']
+            except KeyError:
+                yield Request(PRICE_URL+item['pid'], callback=self.parse_price, meta={'item': item})
+            else:
+                break
+        item['priceInfo'] = response.body_as_unicode()
+        yield Request(STOCK_URL + item['pid'] + '&' + item['cateid'], callback=self.parse_stock, meta={'item': item})
 
     def parse_stock(self, response):
-        itemObj = response.meta['item']
-        itemObj.add_value('stock', response.body.decode('gbk'))
-        return itemObj.load_item()
+        item = response.meta['item']
+        item['stock'] = response.body.decode('gbk')
+        yield Request(DESC_URL + item['pid'] + '&' + item['cateid'] + '&_=' + str(time.time()*1000), callback=self.parse_desc, meta={'item': item})
+        # yield item
 
     def parse_desc(self,response):
-        itemObj = response.meta['item']
-        itemObj.add_value('description', response.body.decode('gbk'))
-        return itemObj.load_item()
+        item = response.meta['item']
+        # itemld = response.meta['itemld']
+        item['description'] = response.body.decode('gbk')
+        yield item
+
     

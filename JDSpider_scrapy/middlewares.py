@@ -8,6 +8,9 @@
 from scrapy import signals
 import random
 from JDSpider_scrapy.settings import PROXY_LIST
+import logging
+
+logger = logging.getLogger("JDSpider_scrapy.middleware")
 
 class JdspiderScrapySpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
@@ -58,11 +61,13 @@ class JdspiderScrapySpiderMiddleware(object):
 
 
 class ProxyMiddleware(object):
-
     def process_request(self, request, spider):
         with open(PROXY_LIST) as f:
             proxies = f.readlines()
-        request.meta['proxy'] = 'http://{}'.format(random.choice(proxies)).rstrip()
+        proxy = random.choice(proxies).rstrip()
+        request.meta['proxy'] = 'http://' + proxy
+        logger.info("process request %s using proxy %s" % (request, proxy))
+        # print(request.meta['proxy'])
 
 
 
