@@ -64,8 +64,8 @@ class ProxyMiddleware(object):
     def process_request(self, request, spider):
         with open(PROXY_LIST) as f:
             proxies = f.readlines()
-        proxy = random.choice(proxies).rstrip()
-        request.meta['proxy'] = 'http://' + proxy
+        proxy = 'http://' + random.choice(proxies).rstrip()
+        request.meta['proxy'] = proxy
         logger.info("process request %s using proxy %s" % (request, proxy))
         # print(request.meta['proxy'])
 

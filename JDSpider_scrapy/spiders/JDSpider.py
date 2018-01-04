@@ -23,7 +23,11 @@ FOOD_TAG = "secondtype|keycount|allfenlei|flmc_14"
 class JDSpider(scrapy.Spider):
     name = "jd"
     start_urls = ["http://www.jd.com/allSort.aspx"]
-
+    custom_settings = {
+        'ITEM_PIPELINES': {
+            'JDSpider_scrapy.pipelines.JdspiderScrapyPipeline':  400
+        }
+    }
 
     def parse(self, response): # process start_url and callback to parse all cate
         if not FOOD_TAG:
@@ -66,29 +70,13 @@ class JDSpider(scrapy.Spider):
         itemld.add_xpath('title', '//div[@class="sku-name"]//text()')
         itemld.add_xpath('brand', '//ul[@id="parameter-brand"]/li/@title')
         itemld.add_xpath('brand', '//div[@class="p-parameter"]/ul/li/a/text()')
+        itemld.add_xpath('shop', '//div[@class="popbox-inner"]//h3//a/@title')
         itemld.add_xpath('categories', '//div[@id="crumb-wrap"]/div/div/div/a/text()')
         itemld.add_xpath('images', '//div[@id="spec-list"]/ul/li/img/@src')
         itemld.add_xpath('ptable', '//div[@class="p-parameter"]/ul/li')
         itemld.add_xpath('params', '//ul[@class="parameter2 p-parameter-list"]/li/text()')
         itemld.load_item()
         yield Request(PRICE_URL+pid, callback=self.parse_price, meta={'item': item})
-        
-        
-        # while True:
-        #     if item.get('price') and item.get('stock') and item.get('description'):
-        #         yield item
-        #     else:
-        #         time.sleep(3)
-        #         print("sleep to wait")
-        #         continue
-        # 
-        # print("print pid",item.get('pid'))
-        # return item
-
-            # !!!!!Problem here!!!!!
-            # while yield request above, maybe parse function can't get value 
-            # immediately, in this way, return item can't be a full object,
-            # it'll miss some value like price, stock and description.
 
     def parse_price(self, response):
         item = response.meta['item']
@@ -106,7 +94,7 @@ class JDSpider(scrapy.Spider):
     def parse_stock(self, response):
         item = response.meta['item']
         item['stock'] = response.body.decode('gbk')
-        yield Request(DESC_URL + item['pid'] + '&' + item['cateid'] + '&_=' + str(time.time()*1000), callback=self.parse_desc, meta={'item': item})
+        yield Request(DESC_URL + item['pid'] + '&' + item['cateid'] + '&_=' + str(int(time.time()*1000)), callback=self.parse_desc, meta={'item': item})
         # yield item
 
     def parse_desc(self,response):
